@@ -54,8 +54,8 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && !GameManager.instance.isGameOver)
         {
-            //IsPointerOverGameObject() metodu farenin veya parmaðýn UI üzerinde olup olmadýðýný kontrol eder.
-            if (EventSystem.current.IsPointerOverGameObject()) return;
+            // farenin veya parmaðýn UI üzerinde olup olmadýðýný kontrol eder.
+            if (IsPointerOverUI()) return;
 
             isLeft = !isLeft;
             SetTargetStates();
@@ -80,6 +80,18 @@ public class PlayerController : MonoBehaviour
             var main = particle.main;
             main.startColor = currentTailColor;
         }
+    }
+
+    private bool IsPointerOverUI()
+    {
+        // Eðer ekranda bir parmak dokunuþu varsa
+        if (Input.touchCount > 0)
+        {
+            return EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId);
+        }
+
+        // Eðer parmak yoksa fare týklamasýný kontrol et
+        return EventSystem.current.IsPointerOverGameObject();
     }
 
     void SetTargetStates()
