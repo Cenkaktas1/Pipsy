@@ -112,11 +112,25 @@ public class PlayerController : MonoBehaviour
         if(collision.CompareTag("PowerUp"))
         {
             StartCoroutine(ActivatePowerUp()); // 5 saniye boyunca yanmama özelliði etkinleþtir
+            AudioManager.instance.PlayEffect(AudioManager.instance.PowerUpSound);
             Destroy(collision.gameObject);
-            return;
         }
 
-        if (collision.CompareTag("Cyan"))
+        else if (collision.CompareTag("Star"))
+        {
+            GameManager.instance.AddStar();
+            AudioManager.instance.PlayEffect(AudioManager.instance.CollectSound);
+            Destroy(collision.gameObject);
+        }
+
+        else if (collision.CompareTag("SlowMotion"))
+        {
+            GameManager.instance.ActivateSlowMotion();
+            AudioManager.instance.PlayEffect(AudioManager.instance.SlowMotionSound);
+            Destroy(collision.gameObject);
+        }
+
+        else if (collision.CompareTag("Cyan"))
         {
             if (!isLeft || isPowerUp)
             {

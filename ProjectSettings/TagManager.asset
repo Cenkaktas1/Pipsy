@@ -7,6 +7,8 @@ TagManager:
   - Cyan
   - Magenta
   - PowerUp
+  - Star
+  - SlowMotion
   layers:
   - Default
   - TransparentFX

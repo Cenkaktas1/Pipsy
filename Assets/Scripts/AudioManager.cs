@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class AudioManager : MonoBehaviour
 {
@@ -15,6 +14,9 @@ public class AudioManager : MonoBehaviour
     public AudioClip GameOverSound;
     public AudioClip PowerUpSound;
     public AudioClip SelectSound;
+    public AudioClip LevelCompletedSound;
+    public AudioClip CollectSound;
+    public AudioClip SlowMotionSound;
 
     public bool isMusicOn;
     public bool isEffectOn;

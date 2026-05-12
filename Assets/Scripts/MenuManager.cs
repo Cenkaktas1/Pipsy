@@ -1,10 +1,13 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
+    [SerializeField] private GameObject MainMenuPanel;
+    [SerializeField] private GameObject LevelPanel;
+    [SerializeField] private GameObject Pipsy;
+
     [SerializeField] private TextMeshProUGUI HighestScoreText;
 
     [SerializeField] private ParticleSystem particle;
@@ -29,14 +32,26 @@ public class MenuManager : MonoBehaviour
         }
 
         UpdateAudioUI();
+        MainMenuPanel.SetActive(true);
+        LevelPanel.SetActive(false);
+        Pipsy.SetActive(true);
     }
 
-    public void StartGame()
+    public void OpenLevelPanel()
     {
-        // Oyun sahnesine geçiþ yap
-        SceneManager.LoadScene("GameScene");
+        // Level paneline geçiþ yap
+        MainMenuPanel?.SetActive(false);
+        LevelPanel?.SetActive(true);
+        if (HighestScoreText != null) HighestScoreText.enabled = false;
+        Pipsy?.SetActive(false);
     }
-
+    public void BackToMainMenu()
+    {
+        LevelPanel?.SetActive(false);
+        MainMenuPanel?.SetActive(true);
+        if (HighestScoreText != null) HighestScoreText.enabled = true;
+        Pipsy?.SetActive(true);
+    }
     public void ChangeMusic()
     {
         AudioManager.instance.MusicOn();
