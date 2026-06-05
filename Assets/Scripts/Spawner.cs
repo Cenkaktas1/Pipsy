@@ -3,12 +3,15 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
+    public static Spawner instance;
+
     [Header("Obstacles")]
     [SerializeField] private GameObject prefabMagenta;
     [SerializeField] private GameObject prefabCyan;
     public float spawnRate = 1.5f;  // Engel çýkma süresi
     public float timer = 0f;
     private float[] spawnPointsX = { -1.5f, 1.5f };
+    private int randomIndex;
 
     [Header("PowerUps and SlowMotion")]
     [SerializeField] private GameObject[] prefabs;
@@ -17,7 +20,24 @@ public class Spawner : MonoBehaviour
 
     [Header("Stars")]
     [SerializeField] private GameObject prefabStar;
-    private int starSpawnChance = 0;    
+    private int starSpawnChance = 0;
+
+    [Header("Light")]
+    [SerializeField] private GameObject prefabLight;
+    [SerializeField] private float lightSpawnRate = 7f;
+
+    [Header("Glitch")]
+    [SerializeField] private GameObject prefabGlitchLine;
+    [SerializeField] private float glitchSpawnRate = 12f;
+    private bool isObstaclePaused = false;
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+    }
 
     void Start()
     {
@@ -25,13 +45,6 @@ public class Spawner : MonoBehaviour
         {
             spawnRate = LevelManager.currentLevel.obstacleSpawnRate;
             starSpawnChance = LevelManager.currentLevel.starSpawnChance;
-
-            // Sadece bu levelin izni varsa PowerUp üretmeye baþla
-            if (LevelManager.currentLevel.canSpawnPowerUps || LevelManager.currentLevel.canSpawnSlowMotion)
-            {
-                powerUpSpawnRate = Random.Range(10f, 15f);
-                StartCoroutine(SpawnPowerUp());
-            }
         }
     }
 
@@ -39,6 +52,8 @@ public class Spawner : MonoBehaviour
     {
         // Oyun bittiyse veya level geçildiyse üretim yapmayý durdur
         if (GameManager.instance.isGameOver || GameManager.instance.isLevelComplete) return;
+
+        if (isObstaclePaused) return;
 
         timer += Time.deltaTime;
 
@@ -51,9 +66,27 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    public void CallPowerUp()
+    {
+        powerUpSpawnRate = Random.Range(10f, 15f);
+        StartCoroutine(SpawnPowerUp());
+    }
+
+    public void CallLight()
+    {
+        lightSpawnRate = Random.Range(9f, 12f);
+        StartCoroutine(SpawnLight());
+    }
+
+    public void CallGlitch()
+    {
+        glitchSpawnRate = Random.Range(20f, 25f); // Glitchin ilk gelme süresi biraz uzun olsun ki oyuncu önce bir normal oynasýn
+        StartCoroutine(SpawnGlitchLine());
+    }
+
     private void SpawnEntity()
     {        
-        int randomIndex = Random.Range(0, spawnPointsX.Length);
+        randomIndex = Random.Range(0, spawnPointsX.Length);
         float randomX = spawnPointsX[randomIndex];
         GameObject prefab = Random.value < 0.5f ? prefabCyan : prefabMagenta;
 
@@ -70,11 +103,30 @@ public class Spawner : MonoBehaviour
             // Yýldýzýn pozisyonu
             Vector3 starSpawnPoint = new Vector3(starX, 6f, 0);
             Instantiate(prefabStar, starSpawnPoint, Quaternion.identity);
+        }   
+    }
+
+    private IEnumerator SpawnLight()
+    {
+        yield return new WaitForSeconds(lightSpawnRate);
+
+        while (!GameManager.instance.isGameOver && !GameManager.instance.isLevelComplete)
+        {
+            if (prefabLight != null && LevelManager.currentLevel.isLightAvailable)
+            {
+                int lightIndex = (randomIndex == 0) ? 1 : 0;
+                float lightX = spawnPointsX[lightIndex];
+
+                Vector3 lightSpawnPoint = new Vector3(lightX, 6f, 0);
+                Instantiate(prefabLight, lightSpawnPoint, Quaternion.identity);
+            }
+            yield return new WaitForSeconds(lightSpawnRate);
         }
     }
 
     private IEnumerator SpawnPowerUp()
     {
+        Time.timeScale = 1f;
         yield return new WaitForSeconds(powerUpSpawnRate);
         bool isFirstPowerUp = true;
         bool isFirstSlowMotion = true;
@@ -116,5 +168,47 @@ public class Spawner : MonoBehaviour
 
             yield return new WaitForSeconds(powerUpSpawnRate);
         }
+    }
+
+    private IEnumerator SpawnGlitchLine()
+    {
+        bool isFirstGlitch = true;
+        Time.timeScale = 1f;
+
+        // Ýlk glitch çizgisi gelmeden önce bekle
+        yield return new WaitForSeconds(glitchSpawnRate);
+
+        while (!GameManager.instance.isGameOver && !GameManager.instance.isLevelComplete)
+        {
+            if (prefabGlitchLine != null && LevelManager.currentLevel.isGlitchAvailable)
+            {
+                // Glitch çizgisi dikey ekraný kapladýðý için X ekseninde 0 (tam orta) noktasýnda doðmalý
+                Vector3 glitchSpawnPoint = new Vector3(0f, 6f, 0f);
+                Instantiate(prefabGlitchLine, glitchSpawnPoint, Quaternion.identity);
+
+                StartCoroutine(PauseObstaclesRoutine(2.5f));
+            }
+
+            if(isFirstGlitch && LevelManager.currentLevel.isGlitchTutorial)
+            {
+                GameManager.instance.ShowGlitchTutorialPanel();
+                isFirstGlitch = false;
+            }
+
+            // Bir sonraki glitch çizgisinin ne zaman geleceðini belirle
+            // Örneðin her 10-15 saniyede bir normal/ters evren arasýnda geçiþ yapsýn
+            glitchSpawnRate = Random.Range(20f, 25f);
+            yield return new WaitForSeconds(glitchSpawnRate);
+        }
+    }
+
+    private IEnumerator PauseObstaclesRoutine(float pauseDuration)
+    {
+        isObstaclePaused = true; // Engel üretimini kilitle
+        timer = 0f; // Zamanlayýcýyý sýfýrla ki, mola biter bitmez aniden engel fýrlamasýn
+
+        yield return new WaitForSeconds(pauseDuration); // Belirlenen süre (örn: 2.5sn) kadar bekle
+
+        isObstaclePaused = false; // Kilidi aç, oyun normal akýþýna dönsün
     }
 }

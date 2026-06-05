@@ -17,6 +17,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip LevelCompletedSound;
     public AudioClip CollectSound;
     public AudioClip SlowMotionSound;
+    public AudioClip GlitchSound;
 
     public bool isMusicOn;
     public bool isEffectOn;

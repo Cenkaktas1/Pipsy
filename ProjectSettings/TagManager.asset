@@ -9,6 +9,8 @@ TagManager:
   - PowerUp
   - Star
   - SlowMotion
+  - Light2D
+  - GlitchLine
   layers:
   - Default
   - TransparentFX

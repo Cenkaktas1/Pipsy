@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a0409fe6d768a04785ba08852ec74f6, type: 3}
+  m_Name: Level_37
+  m_EditorClassIdentifier: 
+  levelIndex: 37
+  isTutorial: 0
+  isEndless: 0
+  baseObstacleSpeed: 3.5
+  maxObstacleSpeed: 8
+  speedIncreaseMultiplier: 0.15
+  obstacleSpawnRate: 1.5
+  targetScore: 30
+  canSpawnPowerUps: 0
+  isPowerUpTutorial: 0
+  canSpawnSlowMotion: 0
+  isSlowMotionTutorial: 0
+  starSpawnChance: 20
+  canObstaclesShift: 0
+  isFirstTimeShift: 0
+  isLevelDark: 1
+  isDarkTutorial: 0
+  isLightAvailable: 1
+  isGlitchAvailable: 0
+  isGlitchTutorial: 0

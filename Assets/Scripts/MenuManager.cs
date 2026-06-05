@@ -5,7 +5,9 @@ using UnityEngine.UI;
 public class MenuManager : MonoBehaviour
 {
     [SerializeField] private GameObject MainMenuPanel;
+    [SerializeField] private GameObject LevelAndEndlessPanel;
     [SerializeField] private GameObject LevelPanel;
+    [SerializeField] private GameObject LevelPanel_2;
     [SerializeField] private GameObject Pipsy;
 
     [SerializeField] private TextMeshProUGUI HighestScoreText;
@@ -19,8 +21,8 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private Sprite soundOff;
 
     [Header("UI Referanslarý")]
-    [SerializeField] private Image musicBtnImage;
-    [SerializeField] private Image soundBtnImage;
+    [SerializeField] private Image[] musicBtnImage;
+    [SerializeField] private Image[] soundBtnImage;
 
     private void Start()
     {
@@ -32,23 +34,49 @@ public class MenuManager : MonoBehaviour
         }
 
         UpdateAudioUI();
-        MainMenuPanel.SetActive(true);
-        LevelPanel.SetActive(false);
-        Pipsy.SetActive(true);
+        MainMenuPanel?.SetActive(true);
+        LevelAndEndlessPanel?.SetActive(false);
+        LevelPanel?.SetActive(false);
+        LevelPanel_2?.SetActive(false);
+        Pipsy?.SetActive(true);
+    }
+
+    public  void OpenLevelAndEndlessPanel()
+    {
+        MainMenuPanel?.SetActive(false);
+        LevelAndEndlessPanel?.SetActive(true);
     }
 
     public void OpenLevelPanel()
     {
         // Level paneline geçiþ yap
-        MainMenuPanel?.SetActive(false);
+        LevelAndEndlessPanel?.SetActive(false);
+        LevelPanel_2?.SetActive(false);
         LevelPanel?.SetActive(true);
         if (HighestScoreText != null) HighestScoreText.enabled = false;
         Pipsy?.SetActive(false);
     }
+
+    public void OpenLevelPanel_2()
+    {
+        LevelPanel?.SetActive(false);
+        LevelPanel_2?.SetActive(true);
+    }
+
     public void BackToMainMenu()
     {
         LevelPanel?.SetActive(false);
+        LevelPanel_2?.SetActive(false);
+        LevelAndEndlessPanel?.SetActive(false);
         MainMenuPanel?.SetActive(true);
+        if (HighestScoreText != null) HighestScoreText.enabled = true;
+        Pipsy?.SetActive(true);
+    }
+
+    public void BackToLevelAndEndlessPanel()
+    {
+        LevelPanel?.SetActive(false);
+        LevelAndEndlessPanel?.SetActive(true);
         if (HighestScoreText != null) HighestScoreText.enabled = true;
         Pipsy?.SetActive(true);
     }
@@ -66,14 +94,13 @@ public class MenuManager : MonoBehaviour
 
     private void UpdateAudioUI()
     {
-        if (musicBtnImage != null)
+        if (musicBtnImage != null && soundBtnImage != null)
         {
-            musicBtnImage.sprite = AudioManager.instance.isMusicOn ? musicOn : musicOff;
-        }
-
-        if (soundBtnImage != null)
-        {
-            soundBtnImage.sprite = AudioManager.instance.isEffectOn ? soundOn : soundOff;
+            for(int i = 0; i < soundBtnImage.Length; i++)
+            {
+                musicBtnImage[i].sprite = AudioManager.instance.isMusicOn ? musicOn : musicOff;
+                soundBtnImage[i].sprite = AudioManager.instance.isEffectOn ? soundOn : soundOff;
+            }
         }
     }
 }

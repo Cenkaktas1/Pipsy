@@ -15,8 +15,8 @@ MonoBehaviour:
   levelIndex: 3
   isTutorial: 0
   isEndless: 0
-  baseObstacleSpeed: 8
-  maxObstacleSpeed: 11
+  baseObstacleSpeed: 7
+  maxObstacleSpeed: 10
   speedIncreaseMultiplier: 0.2
   obstacleSpawnRate: 1.5
   targetScore: 15
@@ -24,4 +24,10 @@ MonoBehaviour:
   isPowerUpTutorial: 0
   canSpawnSlowMotion: 0
   isSlowMotionTutorial: 0
-  starSpawnChance: 15
+  starSpawnChance: 30
+  canObstaclesShift: 0
+  isFirstTimeShift: 0
+  isLevelDark: 0
+  isDarkTutorial: 0
+  isLightAvailable: 0
+  isGlitchAvailable: 0

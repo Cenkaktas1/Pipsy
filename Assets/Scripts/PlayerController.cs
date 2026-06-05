@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
     private bool isLeft = true;
     private bool isGameOver = false;
 
+    // --- YENÝ: GLITCH (AYNA) MODU DEÐÝÞKENÝ ---
+    public bool isMirrorModeActive = false;
+
     private float targetX; // Gitmek istediðimiz hedef X noktasý
     private Color targetColor; // Dönüþmek istediðimiz hedef renk
     private SpriteRenderer spriteRenderer;
@@ -30,6 +33,9 @@ public class PlayerController : MonoBehaviour
 
     private bool isPowerUp = false;
     private float PowerUpTimer = 5f;
+
+    [Header("Glitch Efektleri")]
+    [SerializeField] private ParticleSystem glitchParticle; // Yeni patlama partikülü
 
     void Start()
     {
@@ -50,7 +56,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if(Time.timeScale == 0f) return; // Oyun durdurulmuþsa hiçbir þey yapma
+        if (Time.timeScale == 0f) return; // Oyun durdurulmuþsa hiçbir þey yapma
 
         if (Input.GetMouseButtonDown(0) && !GameManager.instance.isGameOver)
         {
@@ -96,20 +102,43 @@ public class PlayerController : MonoBehaviour
 
     void SetTargetStates()
     {
+        // Fiziksel olarak gitmek istediðimiz X koordinatý (Bu hep ayný kalmalý)
         targetX = isLeft ? leftLaneX : rightLaneX;
-        targetColor = isLeft ? colorLeft : colorRight;
 
+        // --- KRÝTÝK AYAR: ANIMASYON RENGÝNÝ HESAPLA ---
+        // Eðer ayna modu aktifse, animatöre fiziksel konumun TERSÝ deðerini gönderiyoruz.
+        // Böylece soldayken saðýn animasyonu (Cyan), saðdayken solun animasyonu (Magenta) oynuyor.
+        bool visualIsLeft = isMirrorModeActive ? !isLeft : isLeft;
+
+        // Kuyruk/Partikül rengi için hedefi belirle
+        if (isMirrorModeActive)
+        {
+            targetColor = isLeft ? colorRight : colorLeft;
+        }
+        else
+        {
+            targetColor = isLeft ? colorLeft : colorRight;
+        }
+
+        // Animatördeki "isLeft" parametresine artýk fiziksel deðiþkeni deðil, 
+        // ayna modunu hesaba katan "visualIsLeft" deðerini gönderiyoruz.
         if (anim != null)
         {
-            anim.SetBool("isLeft", isLeft);
+            anim.SetBool("isLeft", visualIsLeft);
         }
+    }
+
+    public void ToggleMirrorMode()
+    {
+        isMirrorModeActive = !isMirrorModeActive;
+        SetTargetStates(); // Mod deðiþtiði an, ekrana dokunulmasýný beklemeden rengi anýnda güncelle
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision == null) return;
 
-        if(collision.CompareTag("PowerUp"))
+        if (collision.CompareTag("PowerUp"))
         {
             StartCoroutine(ActivatePowerUp()); // 5 saniye boyunca yanmama özelliði etkinleþtir
             AudioManager.instance.PlayEffect(AudioManager.instance.PowerUpSound);
@@ -130,9 +159,13 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
+        //CYAN ÇARPIÞMASI
         else if (collision.CompareTag("Cyan"))
         {
-            if (!isLeft || isPowerUp)
+            // Güvende olma durumu: Normalde saðda (!isLeft) olmak güvendir. Ayna modunda ise solda (isLeft) olmak güvendir.
+            bool isSafe = isMirrorModeActive ? isLeft : !isLeft;
+
+            if (isSafe || isPowerUp)
             {
                 GameManager.instance.AddScore();
                 AudioManager.instance.PlayEffect(AudioManager.instance.ScoreSound);
@@ -144,9 +177,14 @@ public class PlayerController : MonoBehaviour
                 AudioManager.instance.PlayEffect(AudioManager.instance.GameOverSound);
             }
         }
+
+        // MAGENTA ÇARPIÞMASI
         else if (collision.CompareTag("Magenta"))
         {
-            if (isLeft || isPowerUp)
+            // Güvende olma durumu: Normalde solda (isLeft) olmak güvendir. Ayna modunda ise saðda (!isLeft) olmak güvendir.
+            bool isSafe = isMirrorModeActive ? !isLeft : isLeft;
+
+            if (isSafe || isPowerUp)
             {
                 GameManager.instance.AddScore();
                 AudioManager.instance.PlayEffect(AudioManager.instance.ScoreSound);
@@ -156,6 +194,31 @@ public class PlayerController : MonoBehaviour
                 anim.SetTrigger("doShock");
                 GameManager.instance.GameOver();
                 AudioManager.instance.PlayEffect(AudioManager.instance.GameOverSound);
+            }
+        }
+
+        else if (collision.CompareTag("Light2D"))
+        {
+            AudioManager.instance.PlayEffect(AudioManager.instance.PowerUpSound);
+            GameManager.instance.ActivateLightPowerUp(3.5f);
+            Destroy(collision.gameObject);
+        }
+
+        else if (collision.CompareTag("GlitchLine"))
+        {
+            AudioManager.instance.PlayEffect(AudioManager.instance.GlitchSound);
+
+            ToggleMirrorMode();
+
+            if (CameraShake.instance != null)
+            {
+                CameraShake.instance.Shake(0.15f, 0.2f);
+            }
+
+            if(glitchParticle != null)
+            {
+                glitchParticle.transform.position = transform.position; // Efekti karakterin üstüne taþý
+                glitchParticle.Play(); // Patlat!
             }
         }
     }
@@ -176,9 +239,9 @@ public class PlayerController : MonoBehaviour
         float WarningTime = 0f;
         float WarningRate = 0.15f;
         isPowerUp = true;
-        
-        if (anim != null) 
-        { 
+
+        if (anim != null)
+        {
             anim.speed = 2f;
             anim.SetBool("isPowerUp", true);
         }
@@ -199,5 +262,19 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("isPowerUp", false);
             anim.speed = 1f;
         }
+    }
+
+    public void ActivateShieldFromRevive()
+    {
+        // 1. Eðer animatör tanýmlýysa onu baþlangýç (hayatta kalma) durumuna sýfýrla
+        if (anim != null)
+        {
+            anim.ResetTrigger("doShock"); // Þok tetikleyicisini iptal et
+            anim.Rebind(); // Animatörü oyunun ilk baþladýðý o varsayýlan hale döndür
+            anim.Update(0f); // Deðiþikliði anýnda ekrana yansýt
+        }
+
+        // 2. Eski yazdýðýn ActivatePowerUp coroutine'ini tetikler (5 saniye ölümsüzlük)
+        StartCoroutine(ActivatePowerUp());
     }
 }

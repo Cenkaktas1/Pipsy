@@ -24,4 +24,10 @@ MonoBehaviour:
   isPowerUpTutorial: 0
   canSpawnSlowMotion: 1
   isSlowMotionTutorial: 1
-  starSpawnChance: 12
+  starSpawnChance: 22
+  canObstaclesShift: 0
+  isFirstTimeShift: 0
+  isLevelDark: 0
+  isDarkTutorial: 0
+  isLightAvailable: 0
+  isGlitchAvailable: 0

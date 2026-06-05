@@ -25,4 +25,17 @@ public class LevelData : ScriptableObject
 
     [Header("Star Settings")]
     [Range(0, 100)] public int starSpawnChance = 20;
+
+    [Header("Özel Mekanikler")]
+    public bool canObstaclesShift = false; // Bu bölümde engeller çapraz kayabilir mi?
+    public bool isFirstTimeShift = false;
+
+    [Header("Karanlýk Mod")]
+    public bool isLevelDark = false;
+    public bool isDarkTutorial = false;
+    public bool isLightAvailable = false;
+
+    [Header("Glitch")]
+    public bool isGlitchAvailable = false;
+    public bool isGlitchTutorial = false;
 }
