@@ -9,9 +9,9 @@ public class AdManager : MonoBehaviour
 
     [Header("Ödüllü Reklam (Rewarded Ad) ID'leri")]
 #if UNITY_ANDROID
-    private string rewardedAdUnitId = "ca-app-pub-3940256099942544/5224354917";
+    private string rewardedAdUnitId = "ca-app-pub-2253052581488553/5587774728";
 #elif UNITY_IOS
-    private string rewardedAdUnitId = "ca-app-pub-3940256099942544/1712485313";
+    private string rewardedAdUnitId = "ca-app-pub-2253052581488553/4495174586";
 #else
     private string rewardedAdUnitId = "unexpected_platform";
 #endif
@@ -19,9 +19,9 @@ public class AdManager : MonoBehaviour
 
     [Header("Geçiþ Reklamý (Interstitial Ad) ID'leri")]
 #if UNITY_ANDROID
-    private string interstitialAdUnitId = "ca-app-pub-3940256099942544/1033173712";
+    private string interstitialAdUnitId = "ca-app-pub-2253052581488553/9906979441";
 #elif UNITY_IOS
-    private string interstitialAdUnitId = "ca-app-pub-3940256099942544/4411468910";
+    private string interstitialAdUnitId = "ca-app-pub-2253052581488553/3182092911";
 #else
     private string interstitialAdUnitId = "unexpected_platform";
 #endif
@@ -32,6 +32,8 @@ public class AdManager : MonoBehaviour
 
     private void Awake()
     {
+        MobileAds.RaiseAdEventsOnUnityMainThread = true;
+
         if (instance == null)
         {
             instance = this;
@@ -90,15 +92,26 @@ public class AdManager : MonoBehaviour
     {
         if (rewardedAd != null && rewardedAd.CanShowAd())
         {
+            // YENÝ EKLENEN: Reklam kapandýðýnda (ödül alýnsa da alýnmasa da) her halükarda yenisini yükle
+            rewardedAd.OnAdFullScreenContentClosed += () =>
+            {
+                lock (mainThreadActions)
+                {
+                    mainThreadActions.Enqueue(() =>
+                    {
+                        LoadRewardedAd();
+                    });
+                }
+            };
+
             rewardedAd.Show((Reward reward) =>
             {
-                // YENÝ: Oyuncu ödülü kazandýðýnda iþlemi güvenli kuyruða ekle (Çökmeyi engeller)
+                // Oyuncu ödülü kazandýðýnda sadece canlandýrma iþlemini yap
                 lock (mainThreadActions)
                 {
                     mainThreadActions.Enqueue(() =>
                     {
                         if (GameManager.instance != null) GameManager.instance.RevivePlayer();
-                        LoadRewardedAd(); // Yenisini yükle
                     });
                 }
             });

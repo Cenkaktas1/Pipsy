@@ -796,12 +796,20 @@ public class GameManager : MonoBehaviour
     // Asýl "Bölüm Tamamlandý" panelini güvenli bir þekilde ekrana getiren merkez fonksiyon
     private void ShowRealLevelCompletePanel()
     {
-        // YENÝ EKLENEN: Ýþletim sistemi oyunu devam ettirmeye çalýþsa bile zamaný kesinlikle durdur!
         Time.timeScale = 0f;
 
         if (LevelCompletePanel != null)
         {
             LevelCompletePanel.SetActive(true);
+        }
+    }
+
+    public void ClickWatchAdButton()
+    {
+        // Oyun yöneticisi, ölümsüz AdManager'ý bulup reklamý tetikler
+        if (AdManager.instance != null)
+        {
+            AdManager.instance.ShowRewardedAd();
         }
     }
 

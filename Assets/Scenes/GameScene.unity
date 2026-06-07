@@ -12333,9 +12333,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 467307374}
-        m_TargetAssemblyTypeName: AdManager, Assembly-CSharp
-        m_MethodName: ShowRewardedAd
+      - m_Target: {fileID: 286631272}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ClickWatchAdButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -14224,7 +14224,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 286631272}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: DeclineRevive
+        m_MethodName: SkipAdButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
