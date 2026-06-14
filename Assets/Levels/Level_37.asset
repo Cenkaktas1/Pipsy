@@ -16,7 +16,7 @@ MonoBehaviour:
   isTutorial: 0
   isEndless: 0
   baseObstacleSpeed: 3.5
-  maxObstacleSpeed: 8
+  maxObstacleSpeed: 7
   speedIncreaseMultiplier: 0.15
   obstacleSpawnRate: 1.5
   targetScore: 30
@@ -30,5 +30,6 @@ MonoBehaviour:
   isLevelDark: 1
   isDarkTutorial: 0
   isLightAvailable: 1
+  isLightTutorial: 0
   isGlitchAvailable: 0
   isGlitchTutorial: 0

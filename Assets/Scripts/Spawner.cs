@@ -108,6 +108,8 @@ public class Spawner : MonoBehaviour
 
     private IEnumerator SpawnLight()
     {
+        bool isFirstLight = true;
+        Time.timeScale = 1f;
         yield return new WaitForSeconds(lightSpawnRate);
 
         while (!GameManager.instance.isGameOver && !GameManager.instance.isLevelComplete)
@@ -119,6 +121,12 @@ public class Spawner : MonoBehaviour
 
                 Vector3 lightSpawnPoint = new Vector3(lightX, 6f, 0);
                 Instantiate(prefabLight, lightSpawnPoint, Quaternion.identity);
+
+                if (isFirstLight && LevelManager.currentLevel.isLightTutorial)
+                {
+                    GameManager.instance.ShowLightTutorialPanel();
+                    isFirstLight = false; // Bayraðý indir, bir daha panel çýkmasýn
+                }
             }
             yield return new WaitForSeconds(lightSpawnRate);
         }

@@ -34,6 +34,7 @@ public class LevelData : ScriptableObject
     public bool isLevelDark = false;
     public bool isDarkTutorial = false;
     public bool isLightAvailable = false;
+    public bool isLightTutorial;
 
     [Header("Glitch")]
     public bool isGlitchAvailable = false;

@@ -96,6 +96,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI AdTimerText; // "Reklam Baþlýyor: 5" yazýsý
     private Coroutine adTimerCoroutine;
 
+    [Header("Light Tutorial Ayarlarý")]
+    [SerializeField] private GameObject LightPanel;
+    private bool isLightTutorialWaiting = false;
+
     void Awake()
     {
         if (instance == null)
@@ -124,6 +128,7 @@ public class GameManager : MonoBehaviour
         GlitchTutorialPanel?.SetActive(false);
         AdPanel?.SetActive(false);
         InterstitialTimerPanel?.SetActive(false);
+        LightPanel?.SetActive(false);
 
         if (LevelManager.currentLevel.isLevelDark)
             isLightTransitioning = true;
@@ -214,6 +219,14 @@ public class GameManager : MonoBehaviour
             if (GlitchTutorialPanel != null) GlitchTutorialPanel.SetActive(false);
 
             Time.timeScale = 1f; // Oyuncu ekrana dokunursa zaman tekrar aksýn
+        }
+
+        if (isLightTutorialWaiting && Input.GetMouseButtonDown(0))
+        {
+            isLightTutorialWaiting = false;
+            if (LightPanel != null) LightPanel.SetActive(false);
+
+            Time.timeScale = 1f; // Oyuncu ekrana dokunursa zaman tekrar aksýn, oyun baþlasýn!
         }
 
         if (isLightTransitioning)
@@ -640,6 +653,13 @@ public class GameManager : MonoBehaviour
 
         GlitchTutorialPanel?.SetActive(true);
 
+    }
+
+    public void ShowLightTutorialPanel()
+    {
+        Time.timeScale = 0f; // Paneli gösterirken zamaný dondur
+        isLightTutorialWaiting = true;
+        LightPanel?.SetActive(true);
     }
 
     //----------------------------------------------------//

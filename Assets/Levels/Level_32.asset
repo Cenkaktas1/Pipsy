@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a0409fe6d768a04785ba08852ec74f6, type: 3}
   m_Name: Level_32
   m_EditorClassIdentifier: 
-  levelIndex: 32
+  levelIndex: 6
   isTutorial: 0
   isEndless: 0
   baseObstacleSpeed: 3.5
-  maxObstacleSpeed: 8
+  maxObstacleSpeed: 6
   speedIncreaseMultiplier: 0.2
   obstacleSpawnRate: 1.5
   targetScore: 20
@@ -30,4 +30,6 @@ MonoBehaviour:
   isLevelDark: 1
   isDarkTutorial: 0
   isLightAvailable: 1
+  isLightTutorial: 1
   isGlitchAvailable: 0
+  isGlitchTutorial: 0
